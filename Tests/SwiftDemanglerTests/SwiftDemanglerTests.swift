@@ -40,4 +40,11 @@ final class SwiftDemanglerTests: XCTestCase {
 
         XCTAssertEqual(parser.parse("Sb_SbtSi_t"), FunctionSignature(returnType: .list([.bool, .bool]), argsType: .list([.int])))
     }
+    
+    func testBuilder() {
+        let builder = NameBuilder()
+        
+        let name = builder.build("13ExampleNumber6isEven6numberSbSi_tF")
+        XCTAssertEqual(name, "ExampleNumber.isEven(number: Swift.Int) -> Swift.Bool")
+    }
 }

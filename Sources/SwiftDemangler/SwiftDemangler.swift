@@ -106,3 +106,42 @@ struct FunctionSignatureParser {
         return FunctionSignature(returnType: returnType, argsType: .list(argsTypes))
     }
 }
+
+public struct NameBuilder {
+    func build(_ string: String) -> String? {
+        let symbols = parseSymbols(from: string)
+        
+        let module = symbols[0]
+        let declName = symbols[1]
+        let labels = symbols[2...]
+        guard let functionSigniture = FunctionSignatureParser().parse(string) else {
+            return nil
+        }
+        
+        guard case .list(let argTypes) = functionSigniture.argsType else {
+            return nil
+        }
+        
+        let argments = zip(labels, argTypes).map { label, argType in
+            return "\(label.identifier): \(buildTypeName(argType))"
+        }.joined(separator: ", ")
+        
+        return "\(module.identifier).\(declName.identifier)(\(argments)) -> \(buildTypeName(functionSigniture.returnType))"
+    }
+    
+    private func buildTypeName(_ type: Type) -> String {
+        switch type {
+        case .bool:
+            return "Swift.Bool"
+        case .float:
+            return "Swift.Float"
+        case .int:
+            return "Swift.Int"
+        case .string:
+            return "Swift.String"
+        case .list(let list):
+            let types = list.map { buildTypeName($0) }
+            return "(\(types.joined(separator: ", ")))"
+        }
+    }
+}
