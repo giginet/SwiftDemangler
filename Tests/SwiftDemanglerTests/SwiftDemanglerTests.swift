@@ -30,5 +30,6 @@ final class SwiftDemanglerTests: XCTestCase {
         let parser = TypeParser()
         
         XCTAssertEqual(parser.parseList(from: "Sb_SbSbt"), .list([.bool, .bool, .bool]))
+        XCTAssertEqual(parser.parseList(from: "Si_t"), .list([.int]))
     }
 }

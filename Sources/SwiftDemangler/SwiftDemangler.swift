@@ -61,7 +61,7 @@ struct TypeParser {
         }
     }
     
-    private let listRegexp = try! NSRegularExpression(pattern: "S._(S.)+t", options: [])
+    private let listRegexp = try! NSRegularExpression(pattern: "S[ibSf]_(S[ibSf])*t", options: [])
     func parseList(from substitution: String) -> Type? {
         let results = listRegexp.matches(in: substitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
         guard let result = results.first else {
