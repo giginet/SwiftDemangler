@@ -32,4 +32,12 @@ final class SwiftDemanglerTests: XCTestCase {
         XCTAssertEqual(parser.parseList(from: "Sb_SbSbt"), .list([.bool, .bool, .bool]))
         XCTAssertEqual(parser.parseList(from: "Si_t"), .list([.int]))
     }
+    
+    func testParseFunctionSignature() {
+        let parser = FunctionSignatureParser()
+        
+        XCTAssertEqual(parser.parse("SbSi_t"), FunctionSignature(returnType: .bool, argsType: .list([.int])))
+
+        XCTAssertEqual(parser.parse("Sb_SbtSi_t"), FunctionSignature(returnType: .list([.bool, .bool]), argsType: .list([.int])))
+    }
 }

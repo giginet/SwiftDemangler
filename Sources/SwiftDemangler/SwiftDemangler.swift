@@ -42,6 +42,16 @@ enum Type: Equatable {
 private let typeRegexp = try! NSRegularExpression(pattern: "S[ibSf]", options: [])
 
 struct TypeParser {
+    func parseTypes(from signiture: String) -> [Type] {
+        let allSubstitutionPattern = "S[ibSf]_S[ibSf]*t|S[ibSf]"
+        let regexp = try! NSRegularExpression(pattern: allSubstitutionPattern, options: [])
+        let results = regexp.matches(in: signiture, options: [], range: NSRange(location: 0, length: signiture.utf16.count))
+        return results.compactMap { result -> Type? in
+            let substitution = signiture[signiture.swiftRange(from: result.range)]
+            return parse(String(substitution))
+        }
+    }
+    
     func parse(_ substitution: String) -> Type? {
         if !substitution.hasPrefix("S") {
             return nil
@@ -69,7 +79,7 @@ struct TypeParser {
         }
         
         let listSubstitution = String(substitution[substitution.swiftRange(from: result.range)])
-        let listResults = typeRegexp.matches(in: listSubstitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
+        let listResults = typeRegexp.matches(in: listSubstitution, options: [], range: NSRange(location: 0, length: listSubstitution.utf16.count))
         let types = listResults.compactMap { listResult -> Type? in
             let range = listSubstitution.swiftRange(from: listResult.range)
             return parse(String(listSubstitution[range]))
@@ -83,7 +93,16 @@ struct FunctionSignature: Equatable {
     let argsType: Type
 }
 
-struct FunctionSignitureParser {
-    func parse(_ functionSigniture: String) {
+struct FunctionSignatureParser {
+    func parse(_ functionSignature: String) -> FunctionSignature? {
+        let typeParser = TypeParser()
+        let result = typeParser.parseTypes(from: functionSignature)
+        
+        guard let returnType = result.first else {
+            return nil
+        }
+        
+        let argsTypes = Array(result.dropFirst())
+        return FunctionSignature(returnType: returnType, argsType: .list(argsTypes))
     }
 }
