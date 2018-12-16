@@ -7,3 +7,10 @@ public extension String {
         return start...end
     }
 }
+//
+//public extension NSTextCheckingResult {
+//    func text(at index: Int) -> String {
+//        let range = self.range(at: index)
+//        
+//    }
+//}

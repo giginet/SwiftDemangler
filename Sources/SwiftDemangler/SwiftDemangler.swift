@@ -39,6 +39,8 @@ enum Type: Equatable {
     indirect case list([Type])
 }
 
+private let typeRegexp = try! NSRegularExpression(pattern: "S[ibSf]", options: [])
+
 struct TypeParser {
     func parse(_ substitution: String) -> Type? {
         if !substitution.hasPrefix("S") {
@@ -55,13 +57,33 @@ struct TypeParser {
         case "Sf":
             return .float
         default:
-            let typeRegexp = try! NSRegularExpression(pattern: "S[ibSf]", options: [])
-            let results = typeRegexp.matches(in: substitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
-            let types = results.compactMap { result -> Type? in
-                let range = substitution.swiftRange(from: result.range)
-                return parse(String(substitution[range]))
-            }
-            return .list(types)
+            return parseList(from: substitution)
         }
+    }
+    
+    private let listRegexp = try! NSRegularExpression(pattern: "S._(S.)+t", options: [])
+    func parseList(from substitution: String) -> Type? {
+        let results = listRegexp.matches(in: substitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
+        guard let result = results.first else {
+            return nil
+        }
+        
+        let listSubstitution = String(substitution[substitution.swiftRange(from: result.range)])
+        let listResults = typeRegexp.matches(in: listSubstitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
+        let types = listResults.compactMap { listResult -> Type? in
+            let range = listSubstitution.swiftRange(from: listResult.range)
+            return parse(String(listSubstitution[range]))
+        }
+        return .list(types)
+    }
+}
+
+struct FunctionSignature: Equatable {
+    let returnType: Type
+    let argsType: Type
+}
+
+struct FunctionSignitureParser {
+    func parse(_ functionSigniture: String) {
     }
 }

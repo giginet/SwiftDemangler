@@ -25,4 +25,10 @@ final class SwiftDemanglerTests: XCTestCase {
         XCTAssertEqual(parser.parse("Sf")!, .float)
         XCTAssertEqual(parser.parse("Sf_SfSft")!, .list([.float, .float, .float]))
     }
+    
+    func testListTypeParser() {
+        let parser = TypeParser()
+        
+        XCTAssertEqual(parser.parseList(from: "Sb_SbSbt"), .list([.bool, .bool, .bool]))
+    }
 }
