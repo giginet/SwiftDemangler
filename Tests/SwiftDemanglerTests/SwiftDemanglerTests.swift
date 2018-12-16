@@ -15,4 +15,14 @@ final class SwiftDemanglerTests: XCTestCase {
         XCTAssertEqual(identifiers[2].identifier, "number")
         XCTAssertEqual(identifiers[2].length, 6)
     }
+    
+    func testTypeParser() {
+        let parser = TypeParser()
+        
+        XCTAssertEqual(parser.parse("Si")!, .int)
+        XCTAssertEqual(parser.parse("Sb")!, .bool)
+        XCTAssertEqual(parser.parse("SS")!, .string)
+        XCTAssertEqual(parser.parse("Sf")!, .float)
+        XCTAssertEqual(parser.parse("Sf_SfSft")!, .list([.float, .float, .float]))
+    }
 }

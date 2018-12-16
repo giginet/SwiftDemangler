@@ -30,3 +30,38 @@ internal func parseSymbols(from name: String) -> [Symbol] {
         return Symbol(identifier: String(identifier), length: identifier.count)
     }
 }
+
+enum Type: Equatable {
+    case bool
+    case int
+    case string
+    case float
+    indirect case list([Type])
+}
+
+struct TypeParser {
+    func parse(_ substitution: String) -> Type? {
+        if !substitution.hasPrefix("S") {
+            return nil
+        }
+        
+        switch substitution {
+        case "Si":
+            return .int
+        case "Sb":
+            return .bool
+        case "SS":
+            return .string
+        case "Sf":
+            return .float
+        default:
+            let typeRegexp = try! NSRegularExpression(pattern: "S[ibSf]", options: [])
+            let results = typeRegexp.matches(in: substitution, options: [], range: NSRange(location: 0, length: substitution.utf16.count))
+            let types = results.compactMap { result -> Type? in
+                let range = substitution.swiftRange(from: result.range)
+                return parse(String(substitution[range]))
+            }
+            return .list(types)
+        }
+    }
+}
